@@ -57,3 +57,9 @@ pub fn style_tree<'a>(root: &'a Node, stylesheet: &'a Stylesheet) -> StyleNode<'
         children: root.children.iter().map(|child| style_tree(child, stylesheet)).collect(),
     }
 }
+
+enum Display {
+    Inline,
+    Block,
+    None,
+}
