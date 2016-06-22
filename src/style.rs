@@ -47,8 +47,8 @@ fn specified_values(elem: &ElementData, stylesheet: &Stylesheet) -> PropertyMap 
     return values;
 }
 
-pub fn style_tree<'a>(root: &'a Node, stylesheet: &'a Stylesheet) -> StyleNode<'a> {
-    StyleNode {
+pub fn style_tree<'a>(root: &'a Node, stylesheet: &'a Stylesheet) -> StyledNode<'a> {
+    StyledNode {
         node: root,
         specified_values: match root.node_type {
             Element(ref elem) => specified_values(elem, stylesheet),
@@ -58,8 +58,30 @@ pub fn style_tree<'a>(root: &'a Node, stylesheet: &'a Stylesheet) -> StyleNode<'
     }
 }
 
-enum Display {
+pub struct StyledNode<'a> {
+    pub node: &'a Node,
+    pub specified_values: PropertyMap,
+    pub children: Vec<<StyleNode<'a>>,
+}
+
+pub enum Display {
     Inline,
     Block,
     None,
+}
+
+impl StyledNode {
+    fn value(&self, name: &str) -> Option<Value> {
+        self.specified_values.get(name).map(|v| v.clone())
+    }
+
+    fn display(&self) -> Display {
+        match.value("display") {
+            Some(Keyword(s)) => match &*s {
+                "block" => Display::Block,
+                "none" => Display::None,
+                => Display::Inline
+            }
+        }
+    }
 }

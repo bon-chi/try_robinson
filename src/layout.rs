@@ -31,3 +31,30 @@ enum BoxType<'a> {
     InlineNode(&'a StyleNode<'a>),
     AnonymousBlock,
 }
+
+fn build_layou_tree<'a>(style_node: &'a StyledNode<'a>) -> LayoutBox {
+    let mut root = LayoutBox::new(match style_node.display() {
+        Block => BlockNode(style_node),
+        Inline => InlineNode(style_node),
+        DisplayNone => panic!("Root node has display: none."),
+    });
+
+    for child in &style_node.children {
+        match childe.display() {
+            Block => root.children.push(build_layou_tree(child)),
+            Inline => root.get_inline_container().children.push(build_layot_tree(childl)),
+            DisplayNone => {}
+        }
+    }
+    return root;
+}
+
+impl LayoutBox {
+    fn new(box_type: BoxType) -> LayoutBox {
+        LayoutBox {
+            box_type: box_type,
+            dimensions: Default::default(),
+            children: Vec::new(),
+        }
+    }
+}
