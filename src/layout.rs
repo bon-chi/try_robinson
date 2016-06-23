@@ -57,4 +57,17 @@ impl LayoutBox {
             children: Vec::new(),
         }
     }
+
+    fn get_inline_container(&mut self) -> &mut LayoutBox {
+        match self.box_type {
+            InlineNode | AnonymousBlock => self,
+            BlockNode => {
+                match self.children.last() {
+                    Some(&LayoutBox { box_type: AnonymousBlock, ..}) => {}
+                    _ => self.children.push(LayoutBox::new(AnonymousBlock)),
+                }
+                self.children.last_mut().unwrap()
+            }
+        }
+    }
 }
