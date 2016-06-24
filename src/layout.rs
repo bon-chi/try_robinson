@@ -70,4 +70,40 @@ impl LayoutBox {
             }
         }
     }
+
+    fn layout(&mut self, containing_block: Dimensions) {
+        match self.box_type {
+            BlockNode => self.layout_block(containing_block),
+            InlineNode => {}
+            AnonymousBlock => {}
+        }
+    }
+
+    fn layout_block(&mut self, containing_block: Dimensions) {
+        self.calculate_block_width(containing_block);
+
+        self.calculate_block_position(containing_block);
+
+        self.layoutl_block_children();
+
+        self.calculate_block_height();
+    }
+
+    fn calculate_block_width(&mut self, containing_block: Dimensions) {
+        let style = self.get_style_node();
+
+        let auto = Keyword("auto".to_string());
+        let mut width = style.value("width").unwrap_or(auto.clone());
+
+        let zero = Length(0.0, Px);
+
+        let mut margin_left = style.lookup("margin-left", "margin", &zero);
+        let mut margin_right = style.lookup("margin-right", "margin", &zero);
+
+        let border_left = style.lookup("border-left-width", "border-widht", &zero);
+        let border_right = style.lookup("bordere-right-width", "border-width", &zero);
+
+        let padding_left = style.lookup("padding-left", "padding", &zero);
+        let padding_right = style.lookup("padding-right", "padding", &zero);
+    }
 }
