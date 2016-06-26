@@ -105,5 +105,58 @@ impl LayoutBox {
 
         let padding_left = style.lookup("padding-left", "padding", &zero);
         let padding_right = style.lookup("padding-right", "padding", &zero);
+
+        let total = [&margin_left,
+                     &margin_right,
+                     &border_left,
+                     &border_right,
+                     &padding_left,
+                     &padding_right,
+                     &width]
+                        .iter()
+                        .map(|v| v.to_px())
+                        .sum();
+
+        if width != auto && total > containing_block.content.width {
+            if margin_left == auto {
+                margin_left = Length(0.0, Px);
+            }
+            if margin_right == auto {
+                margin_right = Length(0.0, Px);
+            }
+        }
+
+        let underflow = containing_block.content.width - total;
+
+        match (width == auto, margin_left == auto, margin_right == auto) {
+            (false, false, false) => {
+                margin_right = Length(margin_right.to_px() + underflow, Px);
+            }
+
+            (false, false, true) => {
+                margin_right = Length(underflow, Px);
+            }
+            (false, true, false) => {
+                margin_left = Length(underflow, Px);
+            }
+            (true, _, _) => {
+                if margin_left == auto {
+                    margin_left = Length(0.0, Px);
+                }
+                if margin_right == auto {
+                    margin_right = Length(0.0, Px);
+                }
+                if underflow >= 0.0 {
+                    widht = Lengh(underflow, Px);
+                } else {
+                    widht = Length(0.0, Px);
+                    margin_right = Length(margin_right.to_px() + underflow, Px);
+                }
+            }
+            (false, true, true) => {
+                margin_left = Length(underflow / 2.0, Px);
+                margin_right = Length(underflow / 2.0, Px);
+            }
+        }
     }
 }
